@@ -1,0 +1,4 @@
+rdflib>=7.0
+pyshacl>=0.25
+# optional — only needed to enable real LLM NL->SPARQL in graphrag.py:
+# google-generativeai>=0.8

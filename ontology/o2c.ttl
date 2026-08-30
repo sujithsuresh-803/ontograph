@@ -1,0 +1,53 @@
+@prefix ex:   <http://sujith.dev/o2c#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================================
+#  Order-to-Cash (O2C) Ontology
+#  A tiny OWL/RDFS schema describing the business domain.
+#  This is the "semantic model": what TYPES of things exist
+#  and how they may relate — independent of any single record.
+# ============================================================
+
+ex:Ontology a owl:Ontology ;
+    rdfs:label "Order-to-Cash Ontology" ;
+    rdfs:comment "Minimal enterprise ontology: Customer -> Order -> LineItem -> Product, Invoice, Payment." .
+
+#  ---- Classes (the entity types) ----
+ex:Customer a owl:Class ; rdfs:label "Customer" ;
+    rdfs:comment "An organisation that places orders." .
+ex:Order a owl:Class ; rdfs:label "Order" ;
+    rdfs:comment "A purchase placed by a Customer." .
+ex:LineItem a owl:Class ; rdfs:label "Line Item" ;
+    rdfs:comment "One product line within an Order." .
+ex:Product a owl:Class ; rdfs:label "Product" .
+ex:Invoice a owl:Class ; rdfs:label "Invoice" ;
+    rdfs:comment "A bill raised for an Order." .
+ex:Payment a owl:Class ; rdfs:label "Payment" ;
+    rdfs:comment "A payment settling an Invoice." .
+
+#  ---- Object properties (edges between entities) ----
+ex:placedBy a owl:ObjectProperty ; rdfs:label "placed by" ;
+    rdfs:domain ex:Order ;    rdfs:range ex:Customer .
+ex:hasLineItem a owl:ObjectProperty ; rdfs:label "has line item" ;
+    rdfs:domain ex:Order ;    rdfs:range ex:LineItem .
+ex:refersTo a owl:ObjectProperty ; rdfs:label "refers to product" ;
+    rdfs:domain ex:LineItem ; rdfs:range ex:Product .
+ex:forOrder a owl:ObjectProperty ; rdfs:label "for order" ;
+    rdfs:domain ex:Invoice ;  rdfs:range ex:Order .
+ex:paysInvoice a owl:ObjectProperty ; rdfs:label "pays invoice" ;
+    rdfs:domain ex:Payment ;  rdfs:range ex:Invoice .
+
+#  ---- Datatype properties (literal attributes) ----
+ex:customerName a owl:DatatypeProperty ; rdfs:domain ex:Customer ; rdfs:range xsd:string .
+ex:region       a owl:DatatypeProperty ; rdfs:domain ex:Customer ; rdfs:range xsd:string .
+ex:orderDate    a owl:DatatypeProperty ; rdfs:domain ex:Order ;    rdfs:range xsd:date .
+ex:quantity     a owl:DatatypeProperty ; rdfs:domain ex:LineItem ; rdfs:range xsd:integer .
+ex:unitPrice    a owl:DatatypeProperty ; rdfs:domain ex:LineItem ; rdfs:range xsd:decimal .
+ex:productName  a owl:DatatypeProperty ; rdfs:domain ex:Product ;  rdfs:range xsd:string .
+ex:category     a owl:DatatypeProperty ; rdfs:domain ex:Product ;  rdfs:range xsd:string .
+ex:amount       a owl:DatatypeProperty ; rdfs:domain ex:Invoice ;  rdfs:range xsd:decimal .
+ex:invoiceStatus a owl:DatatypeProperty ; rdfs:domain ex:Invoice ; rdfs:range xsd:string .
+ex:paymentAmount a owl:DatatypeProperty ; rdfs:domain ex:Payment ; rdfs:range xsd:decimal .

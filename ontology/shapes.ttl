@@ -1,0 +1,38 @@
+@prefix ex:   <http://sujith.dev/o2c#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================================
+#  SHACL shapes = data-quality rules the graph must satisfy.
+#  This is how enterprises keep a knowledge graph trustworthy:
+#  you VALIDATE incoming data against shapes before grounding
+#  an AI agent on it.
+# ============================================================
+
+ex:OrderShape a sh:NodeShape ;
+    sh:targetClass ex:Order ;
+    sh:property [
+        sh:path ex:placedBy ;
+        sh:minCount 1 ; sh:maxCount 1 ;      # every Order has exactly one Customer
+        sh:class ex:Customer ;
+        sh:message "An Order must be placedBy exactly one Customer." ;
+    ] ;
+    sh:property [
+        sh:path ex:hasLineItem ;
+        sh:minCount 1 ;                       # no empty orders
+        sh:message "An Order must have at least one LineItem." ;
+    ] .
+
+ex:InvoiceShape a sh:NodeShape ;
+    sh:targetClass ex:Invoice ;
+    sh:property [
+        sh:path ex:amount ;
+        sh:minCount 1 ; sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;                   # amount must be > 0
+        sh:message "Invoice amount must be a positive decimal." ;
+    ] ;
+    sh:property [
+        sh:path ex:invoiceStatus ;
+        sh:in ( "paid" "unpaid" ) ;           # status is a controlled vocabulary
+        sh:message "invoiceStatus must be 'paid' or 'unpaid'." ;
+    ] .

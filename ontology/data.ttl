@@ -1,0 +1,46 @@
+@prefix ex:  <http://sujith.dev/o2c#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================================
+#  Instance data (the "facts" / A-Box).
+#  Each line below is essentially a TRIPLE: subject predicate object.
+#  e.g.  ex:ord1  ex:placedBy  ex:custAcme .
+# ============================================================
+
+#  ---- Customers ----
+ex:custAcme  a ex:Customer ; ex:customerName "Acme Corp" ;   ex:region "APAC" .
+ex:custGlobex a ex:Customer ; ex:customerName "Globex" ;     ex:region "EMEA" .
+ex:custInitech a ex:Customer ; ex:customerName "Initech" ;   ex:region "APAC" .
+
+#  ---- Products ----
+ex:prodPump  a ex:Product ; ex:productName "Water Pump" ;     ex:category "Hardware" .
+ex:prodFilter a ex:Product ; ex:productName "Filter Cartridge" ; ex:category "Consumable" .
+ex:prodLicense a ex:Product ; ex:productName "Platform License" ; ex:category "Software" .
+
+#  ---- Orders + their line items ----
+ex:ord1 a ex:Order ; ex:orderDate "2026-08-01"^^xsd:date ; ex:placedBy ex:custAcme ;
+    ex:hasLineItem ex:li1a, ex:li1b .
+ex:li1a a ex:LineItem ; ex:refersTo ex:prodPump   ; ex:quantity 4  ; ex:unitPrice 1200.00 .
+ex:li1b a ex:LineItem ; ex:refersTo ex:prodFilter ; ex:quantity 20 ; ex:unitPrice 45.00 .
+
+ex:ord2 a ex:Order ; ex:orderDate "2026-08-05"^^xsd:date ; ex:placedBy ex:custGlobex ;
+    ex:hasLineItem ex:li2a .
+ex:li2a a ex:LineItem ; ex:refersTo ex:prodLicense ; ex:quantity 1 ; ex:unitPrice 50000.00 .
+
+ex:ord3 a ex:Order ; ex:orderDate "2026-08-09"^^xsd:date ; ex:placedBy ex:custAcme ;
+    ex:hasLineItem ex:li3a .
+ex:li3a a ex:LineItem ; ex:refersTo ex:prodFilter ; ex:quantity 100 ; ex:unitPrice 40.00 .
+
+ex:ord4 a ex:Order ; ex:orderDate "2026-08-12"^^xsd:date ; ex:placedBy ex:custInitech ;
+    ex:hasLineItem ex:li4a .
+ex:li4a a ex:LineItem ; ex:refersTo ex:prodPump ; ex:quantity 2 ; ex:unitPrice 1250.00 .
+
+#  ---- Invoices ----
+ex:inv1 a ex:Invoice ; ex:forOrder ex:ord1 ; ex:amount 5700.00  ; ex:invoiceStatus "paid" .
+ex:inv2 a ex:Invoice ; ex:forOrder ex:ord2 ; ex:amount 50000.00 ; ex:invoiceStatus "unpaid" .
+ex:inv3 a ex:Invoice ; ex:forOrder ex:ord3 ; ex:amount 4000.00  ; ex:invoiceStatus "unpaid" .
+ex:inv4 a ex:Invoice ; ex:forOrder ex:ord4 ; ex:amount 2500.00  ; ex:invoiceStatus "paid" .
+
+#  ---- Payments ----
+ex:pay1 a ex:Payment ; ex:paysInvoice ex:inv1 ; ex:paymentAmount 5700.00 .
+ex:pay4 a ex:Payment ; ex:paysInvoice ex:inv4 ; ex:paymentAmount 2500.00 .
