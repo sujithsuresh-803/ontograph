@@ -18,6 +18,34 @@ python src/graphrag.py "who still owes us money in APAC?"
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart TB
+    ONT[ontology/o2c.ttl - OWL/RDFS schema, T-Box] --> KG[(knowledge graph)]
+    DATA[ontology/data.ttl - instances, A-Box] --> KG
+    SH[ontology/shapes.ttl - SHACL shapes] -->|validate before trusting| KG
+    KG --> SQ[SPARQL queries]
+    SQ --> GR[GraphRAG layer]
+```
+
+### GraphRAG flow
+
+```mermaid
+flowchart LR
+    NL([natural-language question]) --> GEN[generate SPARQL]
+    GEN --> RUN[run against the graph]
+    RUN --> F[exact facts and aggregates]
+    F --> LLM[ground the LLM on retrieved triples]
+    LLM --> A([auditable, traceable answer])
+```
+
+Every number in an answer traces back to a triple - which is the point. Vector
+similarity cannot compute "how much do APAC customers still owe?"; a `SUM` over a
+graph traversal can, and it is auditable.
+
+---
+
 ## Teach-me: the five concepts, in plain terms
 
 **1. Knowledge graph = facts as a graph.** Everything is a **triple**:
@@ -27,8 +55,8 @@ walk edges across the whole domain in one query.
 
 **2. Ontology = the schema/vocabulary** (`ontology/o2c.ttl`). It declares the
 *types* (`Customer`, `Order`, `Invoice`) and the *allowed relationships*
-(`Order placedBy Customer`) using **RDFS/OWL**. This is the "semantic model" the
-SAP JD talks about — the shared meaning that lets an AI agent understand data
+(`Order placedBy Customer`) using **RDFS/OWL**. This is the "semantic model" that
+enterprise AI teams talk about — the shared meaning that lets an AI agent understand data
 from SAP, Salesforce, Workday, etc. in the same terms.
 
 **3. SPARQL = SQL for graphs** (`src/queries.py`). You write a *pattern* of
@@ -66,15 +94,16 @@ to a triple.
   is model-generated, and add a self-check that re-queries on empty results
   (the same self-correcting loop idea as RAGgraph).
 
-## Maps to the SAP "Data & Applied Science" JD
-| JD term | Here |
-|---|---|
-| enterprise **ontologies / semantic models** | `ontology/o2c.ttl` |
-| **knowledge graphs**, structured grounding | the whole graph + GraphRAG |
-| **graph query language** (SPARQL) | `src/queries.py` |
-| **RDF / OWL / RDFS / SHACL** (W3C stack) | ontology + `shapes.ttl` |
-| **Order-to-Cash** business context | the modelled domain |
-| grounding agents on **trusted business data** | SHACL validation + GraphRAG |
+## What this demonstrates
 
-## Résumé bullet (accurate once you've run & understood it)
-> **OntoGraph — Order-to-Cash Knowledge Graph + GraphRAG** (Python · rdflib · SPARQL · SHACL · OWL/RDFS) — Modelled an enterprise ontology for the Order-to-Cash process and built a GraphRAG layer that answers natural-language business questions by generating SPARQL, traversing the knowledge graph, validating it with SHACL, and grounding an LLM on the retrieved facts. *Live code · github.com/sujithsuresh-803/ontograph*
+| Capability | Where it lives |
+|---|---|
+| Enterprise **ontologies / semantic models** | `ontology/o2c.ttl` |
+| **Knowledge graphs** & structured grounding | the graph + GraphRAG layer |
+| **Graph query language** (SPARQL) | `src/queries.py` |
+| **W3C semantic stack** — RDF / OWL / RDFS / SHACL | `ontology/` |
+| **Order-to-Cash** business domain modelling | the modelled process |
+| Grounding LLMs on **trusted, validated data** | SHACL validation + `src/graphrag.py` |
+
+---
+*Built by Sujith Suresh.*
